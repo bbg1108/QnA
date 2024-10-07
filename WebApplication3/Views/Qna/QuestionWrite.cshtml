@@ -1,0 +1,90 @@
+﻿@model WebApplication3.Models.Question
+@{
+    ViewData["Title"] = "QnA Page";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/lib/smarteditor2/css/smart_editor2.css">
+    <script src="/lib/smarteditor2/js/HuskyEZCreator.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="~/js/SmartEditor.js"></script>
+    <script>
+        $(document).ready(function () {
+            smartEditor();
+        })
+
+        function submitQuestion() {
+            var name = $("#name").val().trim();
+            var email = $("#email").val().trim();
+            var title = $("#title").val().trim();
+            oEditors.getById["editorTxt"].exec("UPDATE_CONTENTS_FIELD", []);
+            var content = $("#editorTxt").val().trim();
+            if (name === "") {
+                alert("이름을 입력하세요.");
+                return;
+            }
+            if (email === "") {
+                alert("이메일을 입력하세요.");
+                return;
+            }
+            if (title === "") {
+                alert("제목을 입력하세요.");
+                return;
+            }
+            if (content === "<p>&nbsp;</p>") {
+                alert("내용을 입력하세요.");
+                return;
+            }
+            submitForm();
+        }
+    </script>
+</head>
+<body>
+    
+    <div>
+        <form id="qnaForm" asp-action="QuestionWrite" method="post">
+        @Html.AntiForgeryToken()
+        <div>
+            <label for="Name">이름</label>
+            <input type="text" id="name" name="Name" size="40" placeholder="작성자 이름을 입력하세요">
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+        <div>
+            <label for="email">이메일</label>
+            <input type="email" id="email" name="Email" size="40" placeholder="답변을 받을 Email 주소를 입력하세요">
+            <span asp-validation-for="Email"></span>
+        </div>
+        <div>
+            <label for="title">제목</label>
+            <input type="text" id="title" name="Title" size="40" placeholder="제목을 입력하세요">
+            <span asp-validation-for="Title"></span>
+        </div>
+    
+        <div class="row">
+            <!-- 포스트 추가하는 곳-->
+            <!-- Naver SmartEditor 2.8.2를 사용하였습니다. -->
+            <div id="smarteditor">
+                <label for="editorTxt">내용</label>
+                <textarea name="Content"
+                    id="editorTxt"
+                    rows="20"
+                    cols="10"
+                    placeholder="내용을 입력해주세요"
+                    style="width: 700px; height: 350px"></textarea>
+                <span asp-validation-for="Content"></span>
+            </div>
+            <div>
+                <input type="button" class="btn btn-danger" value="확인" onclick="submitQuestion()" style="width: 400px; margin-top: 15px;" />
+            </div>
+        </div>
+        </form>
+    </div>
+    @section Scripts {
+        @{
+            await Html.RenderPartialAsync("_ValidationScriptsPartial");
+        }
+    }
+</body>
+</html>

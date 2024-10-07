@@ -1,0 +1,58 @@
+﻿@model WebApplication3.Models.QuestionAnswer
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QnA Table</title>
+    <link rel="stylesheet" href="~/css/Detail.css" asp-append-version="true" />
+</head>
+
+<h4 style="text-align: center;">Q&A</h4>
+<table class="detailTable">
+    <tr>
+        <th>제목</th>
+        <td colspan="4">@Model.Question.Title</td>
+    </tr>
+    <tr>
+        <th>질문자 E-Mail</th>
+        <td>@Model.Question.Email</td>
+        <th>질문 일시</th>
+        <td>@Model.Question.Date</td>
+    </tr>
+    <tr>
+        <th colspan="4">질의 내용</th>
+    </tr>
+    <tr>
+        <td colspan="4">@Html.Raw(Model.Question.Content)</td>
+    </tr>
+</table>
+
+<table class="detailTable">
+    <tr>
+        <th>답변 계정</th>
+        <td>@(Model.Answer?.Email ?? "")</td>
+        <th>답변 일시</th>
+        <td>@(Model.Answer?.Date ?? "")</td>
+    </tr>
+    <tr>
+        <th colspan="4">답변 내용</th>
+    </tr>
+    <tr>
+        <td colspan="4">@Html.Raw(Model.Answer?.Content ?? "")</td>
+    </tr>
+</table>
+
+<div style="display: flex; justify-content: space-between; margin-top: 20px;">
+    <form asp-action="DeleteQuestion" method="post" class="left-align">
+        <input type="hidden" name="id" value="@Model.Question.Id" />
+        <button type="submit" class="btn text-white delete">삭제</button>
+    </form>
+
+    <form asp-action="SendEmail" method="post" class="right-align">
+        <input type="hidden" name="recipientEmail" value="@Model.Question.Email" />
+        <input type="hidden" name="subject" value="답변에 대한 알림" />
+        <input type="hidden" name="message" value="@(Model.Answer?.Content ?? "없음")" />
+        <input type="hidden" name="id" value="@(Model.Answer?.Id)" />
+        <button type="submit" class="btn text-white send">이메일로 답변 발신</button>
+    </form>
+</div>

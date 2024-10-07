@@ -1,0 +1,21 @@
+﻿.info {
+    background-color: #e6e6e6;
+    border: 2px solid #dddddd;
+}
+
+.questionContent {
+    border: 2px solid #dddddd;
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.content {
+    border: 2px solid #dddddd;
+    padding: 20px;
+    margin-top: 20px;
+}
+
+.right-align {
+    text-align: right;
+    margin-top: 10px;
+}

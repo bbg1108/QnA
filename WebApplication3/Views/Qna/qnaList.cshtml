@@ -1,0 +1,148 @@
+﻿@model IEnumerable<WebApplication3.Models.QuestionAnswer>
+@{
+    ViewData["Title"] = "Your Models";
+    var message = TempData["message"] as string;
+}
+<head>
+    <link rel="stylesheet" href="/lib/smarteditor2/css/smart_editor2.css">
+    <script src="/lib/smarteditor2/js/HuskyEZCreator.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="~/js/SmartEditor.js"></script>
+    <script>
+        function openDetails(id) {
+            Promise.all([
+                fetch(`/Qna/Detail/${id}`).then(response => response.text())
+            ]).then(data => {
+                document.getElementById('popupBody').innerHTML = data.join('<br>');
+                document.getElementById('detailsPopup').style.display = 'block';
+            }).catch(error => {
+                console.error('Error fetching details:', error);
+            });
+        }
+
+        function closeDetails() {
+            document.getElementById('detailsPopup').style.display = 'none';
+        }
+
+        function openEditor(id) {
+            fetch(`/Qna/Answer/${id}`)
+                .then(response => response.text())
+                .then(data => {
+                    document.getElementById('editorBody').innerHTML = data;
+                    document.getElementById('editorPopup').style.display = 'block';
+                    smartEditor(); // 스마트에디터 다시 초기화
+                }).catch(error => {
+                    console.error('Error fetching details:', error);
+                });
+        }
+
+        function closeEditor() {
+            document.getElementById('editorPopup').style.display = 'none';
+            oEditors = []; // 스마트 에디터 객체 초기화
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // 서버에서 설정된 TempData["message"]를 확인합니다
+            var message = @Html.Raw(Json.Serialize(message));
+            if (message) {
+                alert(message);
+            }
+        });
+
+        function submitAnswer() {
+            oEditors.getById["editorTxt"].exec("UPDATE_CONTENTS_FIELD", []);
+            var content = document.getElementById('editorTxt').value;
+
+            if (content === "<p>&nbsp;</p>") {
+                alert('내용을 입력하세요.');
+                return;
+            } else {
+                document.getElementById('qnaForm').submit();
+            }
+            submitForm()
+        }
+    </script>
+    <link rel="stylesheet" href="~/css/qnaList.css" asp-append-version="true" />
+</head>
+
+<h5>Q&A</h5>
+<hr />
+
+<!-- 검색 필터 및 입력란 -->
+<form id="searchForm" method="get" action="@Url.Action("Qnalist", "Qna")">
+    <select id="searchFilter" name="searchFilter">
+        <option value="all">전체</option>
+        <option value="number">번호</option>
+        <option value="title">제목</option>
+        <option value="email">이메일</option>
+    </select>
+    <input type="text" id="searchQuery" name="searchQuery" placeholder="검색어"/>
+    <button type="submit" class="btn btn-success text-white">⌕조회</button>
+</form>
+
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                번호
+            </th>
+            <th>
+                질문 제목
+            </th>
+            <th>
+                질의 일시
+            </th>
+            <th>
+                질문자 E-mail
+            </th>
+            <th>
+                답변 일시
+            </th>
+            <th>
+                답변 계정
+            </th>
+            <th>
+                답변 발신일시
+            </th>
+            <th>
+                기능
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>@item.Question.Id</td>
+                <td><a href="javascript:void(0);" onclick="openDetails('@item.Question.Id')">@item.Question.Title</a></td>
+                <td>@item.Question.Date</td>
+                <td>@item.Question.Email</td>
+                <td>@(item.Answer?.Date)</td>
+                <td>@(item.Answer?.Email)</td>
+                <td>@(item.Answer?.MailDate)</td>
+                <td>
+                    <div class="answerButton">
+                        <button onclick="openDetails('@item.Question.Id')" class="btn btn-outline-success">답변 상세</button>
+                        <button onclick="openEditor('@item.Question.Id')" class="btn btn-outline-primary">답변 수정</button>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<!-- 팝업창 -->
+<div id="detailsPopup" class="popup">
+    <div class="popup-content">
+        <span class="close" onclick="closeDetails()">&times;</span>
+        <div id="popupBody"></div>
+    </div>
+</div>
+
+<div id="editorPopup" class="popup">
+    <div class="popup-content">
+        <span class="close" onclick="closeEditor()">&times;</span>
+            <div id="editorBody"></div>
+    </div>
+</div>
